@@ -1,0 +1,78 @@
+
+
+---
+- hosts: testservers
+  tasks:
+  - name: executing sample command
+    shell: uptime
+    register: result
+
+  - name: printing variable
+    debug:
+      msg: "{{result}}"
+    
+
+
+
+
+
+---
+- hosts: testservers
+  tasks:
+  - name: executing sample command
+    shell: uptime
+    register: result
+
+  - name: printing variable
+    debug:
+      msg: "{{result}}"
+    when: ansible_os_family == "RedHat"
+
+
+
+---
+- hosts: testservers
+  tasks:
+  - name: Run with items greater than 5
+    command: echo {{ item }}
+    loop: [ 0, 2, 4, 6, 8, 10 ]
+    when: item > 5
+
+  
+
+
+
+---
+- hosts: testservers
+  become: yes
+  tasks:
+    - name: Installing Apache on CentOS
+      shell: name=httpd  state=present
+      when: ansible_os_family == "RedHat"
+
+    - name: Install Apache on Ubuntu Server
+      apt: name=apache2 state=present
+      when: ansible_os_family == "Debian"
+
+
+
+---
+- hosts: testservers
+  become: yes
+  tasks:
+    - name: Checking the contents of folder
+      command: "ls /root/ansible"
+      register: contents
+
+    - name: Display the message
+      debug:
+        msg: "Directory is empty"
+      when: contents.stdout == ""
+
+
+
+- hosts: testservers
+  become: yes
+  roles:
+     - role: Installing Apache2
+       when: ansible_os_family == "RedHat"
